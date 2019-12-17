@@ -1,0 +1,30 @@
+.root-BackGround1{
+    -fx-background-image: url(../images/login-background1.png);
+}
+.CenterLoginBg{
+    -fx-background-image: url(../images/login-background2.png);
+}
+/*登录界面大小标题的文字样式*/
+.textFirstTitle{
+    -fx-font-family: "微软雅黑";
+    -fx-font-size: 28px;
+    -fx-font-weight: bold; /*文字加粗*/
+
+}
+.SecondTitle{
+    -fx-font-family: "微软雅黑";
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: red;
+}
+.btnLoginBg{
+    -fx-font-family: "微软雅黑";
+    -fx-background-color: #009789;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+
+}
+.hand{
+    -fx-cursor: hand;
+}

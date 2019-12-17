@@ -1,0 +1,86 @@
+.headPane-BackGround {
+    -fx-background-color: #2c3e50;
+}
+
+/*root面板的样式*/
+.root {
+    -fx-background-color: #0c9286;
+}
+
+.logo {
+    -fx-text-fill: #fff9ea;
+    -fx-font-family: "微软雅黑";
+    -fx-font-size: 24px;
+    -fx-padding: 10px;
+    -fx-background-color: rgba(0, 0, 0, 0.1);
+}
+
+/**top-center部分的按钮样式*/
+.header-nav-button {
+    -fx-pref-width: 100px;
+    -fx-pref-height: 55px;
+    -fx-background-color: transparent; /*透明色*/
+    -fx-font-size: 18px;
+    -fx-font-family: "微软雅黑";
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+}
+
+.header-nav-button:hover {
+    -fx-background-color: #1A242F;
+}
+
+/*给选中的按钮单独添加一个样式*/
+.header-nav-button-Selected {
+
+    -fx-background-color: #1A242F;
+}
+
+/**top-right 登录用户信息文字样式 */
+.header-nav-Right-userlbl {
+    -fx-padding: 10px;
+    -fx-text-fill: white;
+}
+
+/*中间左侧部分 图片标签 样式*/
+.center-left-top-img {
+    -fx-padding: 8px;
+}
+
+.Body-left-Pane {
+    -fx-background-color: rgba(134, 93, 33, 0.62);
+
+}
+
+.TitledPane-Btn {
+    -fx-font-family: "微软雅黑";
+    -fx-text-fill: #ff734a;
+    -fx-pref-width: 240px;
+    -fx-text-alignment: center;
+    -fx-cursor: hand;
+}
+
+/*中间内容面板右边的TabPane的样式*/
+.tab-Item {
+    -fx-background-color: #ffee58;
+    -fx-cursor: hand;
+    -fx-background-radius: 10%;
+    -fx-pref-height: 30px;
+
+
+}
+
+.tab-pane > *.tab-header-area > *.tab-header-background {
+    -fx-background-color: -fx-outer-border, -fx-text-box-border, #333333;
+    -fx-background-radius: 5px;
+}
+/**
+中间面板 右边搜索栏lable控件样式
+ */
+.center-right-content-search-lable{
+    -fx-pref-height: 30px;
+    -fx-text-fill: black;
+    -fx-font-family: "微软雅黑";
+    -fx-font-weight: bold;
+}
