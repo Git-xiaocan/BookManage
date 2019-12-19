@@ -9,6 +9,7 @@ import com.xiaocan.bookmanage.entity.BookSearchCondition;
 import com.xiaocan.bookmanage.service.impl.BookInfoServiceImpl;
 import com.xiaocan.bookmanage.util.Configurations;
 import com.xiaocan.bookmanage.util.SystemConstant;
+import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -44,23 +45,27 @@ public class BookManagePane extends StackPane {
      * Creates a StackPane layout with default CENTER alignment.
      */
     public BookManagePane() {
-        TabPane tabPane = new TabPane();
-        tabPane.getStyleClass().add("tab-pane>*.tab-header-area>*.tab-header-background");
-        //设置tabpane不能被关闭
-        tabPane.setPadding(new Insets(10));
-        tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-
-        Tab tab_bookManage = new Tab("图书管理", CreateTabBookManage());
-        tab_bookManage.getStyleClass().add("tab-Item");
-        tabPane.getTabs().add(tab_bookManage);
-        getChildren().add(tabPane);
 
 
-        InitTableViewColumn();
-        //初始化搜索框
-        initSearchBtn();
-        initClearBtn();
-        CmbBookCateData();
+            TabPane tabPane = new TabPane();
+            tabPane.getStyleClass().add("tab-pane>*.tab-header-area>*.tab-header-background");
+            //设置tabpane不能被关闭
+            tabPane.setPadding(new Insets(10));
+            tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+
+            Tab tab_bookManage = new Tab("图书管理", CreateTabBookManage());
+            tab_bookManage.getStyleClass().add("tab-Item");
+            tabPane.getTabs().add(tab_bookManage);
+            getChildren().add(tabPane);
+
+            InitTableViewColumn();
+            //初始化搜索框
+            initSearchBtn();
+            initClearBtn();
+
+
+
+
 
     }
 
@@ -96,7 +101,11 @@ public class BookManagePane extends StackPane {
 
         tableViewPane.setCenter(createPagination(ITEMPERPAGE, 0));
         //tableViewPane.setBottom(createButtonPane());
+        //给搜索面板cmbbox添加内容
+        Platform.runLater(() -> {
 
+            CmbBookCateData();
+        });
         //将搜索面板添加到跟面板中
         root.setTop(searchPane);
         root.setCenter(tableViewPane);
@@ -131,31 +140,38 @@ public class BookManagePane extends StackPane {
      * private StringProperty Memo;
      */
     private void InitTableViewColumn() {
-        String[] colNames = {"图书编号", "图书名称", "出版号", "拼音输入码", "作者", "关键字", "内容摘要", "单价", "库存", "上架时间"};
-        String[] fields = {"bookId", "bookName", "ISBN", "inputCode", "author", "KeyWords", "ContentInfo", "Price", "StoreCount", "RegDate"};
-        TableColumn[] columns = new TableColumn[colNames.length];
-        int[] colWidths = {80, 120, 80, 120, 100, 120, 200, 40, 40, 80};
-        for (int i = 0; i < colNames.length; i++) {
-            columns[i] = new TableColumn(colNames[i]);
-            //绑定tableview控件和实体类中的属性
-            columns[i].setCellValueFactory(new PropertyValueFactory<FxBook, String>(fields[i]));
-            columns[i].setPrefWidth(colWidths[i]);
-        }
-        tableView.getColumns().addAll(columns);
-        InitTableViewData();
+        Platform.runLater(() -> {
+            String[] colNames = {"图书编号", "图书名称", "出版号", "拼音输入码", "作者", "关键字", "内容摘要", "单价", "库存", "上架时间"};
+            String[] fields = {"bookId", "bookName", "ISBN", "inputCode", "author", "KeyWords", "ContentInfo", "Price", "StoreCount", "RegDate"};
+            TableColumn[] columns = new TableColumn[colNames.length];
+            int[] colWidths = {80, 120, 80, 120, 100, 120, 200, 40, 40, 80};
+            for (int i = 0; i < colNames.length; i++) {
+                columns[i] = new TableColumn(colNames[i]);
+                //绑定tableview控件和实体类中的属性
+                columns[i].setCellValueFactory(new PropertyValueFactory<FxBook, String>(fields[i]));
+                columns[i].setPrefWidth(colWidths[i]);
+            }
+            tableView.getColumns().addAll(columns);
+
+
+            InitTableViewData();
+        });
+
 
     }
 
     private BookInfoServiceImpl bookInfoService = null;
 
     public void InitTableViewData(List<BookInfo> bookinfoList) {
-        if (bookinfoList != null) {
-            this.bookList.clear();
-            bookinfoList.forEach(book -> {
-                this.bookList.add(new FxBook(book));
-            });
-        }
-        RefreshTableView();
+        Platform.runLater(() -> {
+            if (bookinfoList != null) {
+                this.bookList.clear();
+                bookinfoList.forEach(book -> {
+                    this.bookList.add(new FxBook(book));
+                });
+            }
+            RefreshTableView();
+        });
 
 
     }
@@ -171,6 +187,7 @@ public class BookManagePane extends StackPane {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+
         InitTableViewData(bookInfoService.searchAll());
 
 
@@ -394,35 +411,38 @@ public class BookManagePane extends StackPane {
     }
 
     public void RefreshTableView() {
-        if (bookList != null) {
-            int count = bookList.size() / ITEMPERPAGE;
-            if (bookList.size() % ITEMPERPAGE != 0) {
-                count++;
+        Platform.runLater(() -> {
+            if (bookList != null) {
+                int count = bookList.size() / ITEMPERPAGE;
+                if (bookList.size() % ITEMPERPAGE != 0) {
+                    count++;
+                }
+
+
+                pagination.setPageCount(count == 0 ? 1 : count);
+            } else {
+                pagination.setPageCount(1);
             }
 
-
-            pagination.setPageCount(count == 0 ? 1 : count);
-        } else {
-            pagination.setPageCount(1);
-        }
-
-        pagination.setCurrentPageIndex(0);
-        pagination.setPageFactory(new Callback<Integer, Node>() {
-            @Override
-            public Node call(Integer param) {
-                int pageIndex = param.intValue();//获得当前分页的分页下标
+            pagination.setCurrentPageIndex(0);
+            pagination.setPageFactory(new Callback<Integer, Node>() {
+                @Override
+                public Node call(Integer param) {
+                    int pageIndex = param.intValue();//获得当前分页的分页下标
 //                bookList.clear();
-                tableView.getItems().clear();  //为了方便显示不同的查询结果
-                //链接数据库  根据分页下标返回队形的集合数据
-                //为了实现分页的效果 所以需要sublist
-                int fromIndex = pageIndex * ITEMPERPAGE;//起始下标
-                int toIndex = (pageIndex + 1) * ITEMPERPAGE;
-                if (toIndex >= bookList.size()) toIndex = bookList.size();
-                List sublist = bookList.subList(fromIndex, toIndex);
-                tableView.setItems(FXCollections.observableArrayList(sublist));
-                return tableView;
-            }
+                    tableView.getItems().clear();  //为了方便显示不同的查询结果
+                    //链接数据库  根据分页下标返回队形的集合数据
+                    //为了实现分页的效果 所以需要sublist
+                    int fromIndex = pageIndex * ITEMPERPAGE;//起始下标
+                    int toIndex = (pageIndex + 1) * ITEMPERPAGE;
+                    if (toIndex >= bookList.size()) toIndex = bookList.size();
+                    List sublist = bookList.subList(fromIndex, toIndex);
+                    tableView.setItems(FXCollections.observableArrayList(sublist));
+                    return tableView;
+                }
+            });
         });
+
     }
 
     //创建tableview上方的按钮
@@ -509,9 +529,10 @@ public class BookManagePane extends StackPane {
 
 
     }
-    public void initClearBtn(){
 
-        btnClear.setOnMouseClicked(e->{
+    public void initClearBtn() {
+
+        btnClear.setOnMouseClicked(e -> {
 
             cmbKind.setValue("请选择");
             textSearch.setText("请输入关键字...");
