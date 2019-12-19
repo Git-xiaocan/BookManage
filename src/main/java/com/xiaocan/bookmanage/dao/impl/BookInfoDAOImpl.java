@@ -1,11 +1,14 @@
 package com.xiaocan.bookmanage.dao.impl;
 
+import com.sun.corba.se.impl.presentation.rmi.IDLNameTranslatorImpl;
 import com.xiaocan.bookmanage.dao.BaseDAO;
 import com.xiaocan.bookmanage.dao.BookInfoDAO;
 import com.xiaocan.bookmanage.entity.BookInfo;
+import com.xiaocan.bookmanage.entity.BookSearchCondition;
 import com.xiaocan.bookmanage.util.Configurations;
 import com.xiaocan.bookmanage.util.SystemConstant;
 
+import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -89,5 +92,76 @@ public class BookInfoDAOImpl extends BaseDAO implements BookInfoDAO {
 
 
         return list;
+    }
+
+    @Override
+    public List<BookInfo> search(BookSearchCondition condition) {
+        if (condition == null) return null;
+        StringBuilder sql = new StringBuilder("select * from ");
+        sql.append(Configurations.get(SystemConstant.TB_BOOKINFO));
+        sql.append(" where ");
+        Field[] fields = BookSearchCondition.class.getDeclaredFields();
+        try {
+            for (int i = 0; i < fields.length; i++) {
+                fields[i].setAccessible(true);
+
+                if (fields[i].get(condition) == null||fields[i].get(condition).equals("")) continue;
+                if(fields[i].getName().equals("toDate")||fields[i].getName().equals("fromDate")) continue;
+//////                if (fields[i].getName().equals("fromDate")) {
+//////
+//////
+//////
+//////                } else
+                if (fields[i].getType().equals(String.class)) {
+
+                    sql.append(fields[i].getName());
+                    sql.append(" like ");
+                    sql.append("'%" + fields[i].get(condition) + "%'");
+                } else if (fields[i].getType().equals(Integer.class)) {
+                    sql.append(fields[i].getName());
+                    sql.append("=");
+                    sql.append(fields[i].get(condition));
+                }
+                if (i <= fields.length - 1) {
+                    sql.append(" or ");
+
+                }
+
+
+
+            }
+            sql.append(" RegDate between '" + condition.getFromDate() + "' and '" + condition.getToDate() + "';");
+
+            ResultSet resultSet = db_Select(sql.toString());
+            List<BookInfo> list = new ArrayList<>();
+            while (resultSet.next()) {
+                BookInfo bookInfo = new BookInfo(
+                        resultSet.getInt(1)
+                        , resultSet.getString(2)
+                        , resultSet.getString(3)
+                        , resultSet.getString(4)
+                        , resultSet.getString(5)
+                        , resultSet.getString(6)
+                        , resultSet.getString(7)
+                        , resultSet.getString(8)
+                        , resultSet.getString(9)
+                        , resultSet.getString(10)
+                        , resultSet.getString(11)
+                        , resultSet.getInt(12)
+                        , resultSet.getString(13)
+                        , resultSet.getString(14)
+                );
+
+                list.add(bookInfo);
+
+
+            }
+
+            return list;
+        } catch (IllegalAccessException | SQLException e) {
+            e.printStackTrace();
+        }
+//        bookname like %ddd% or bookid =2 or regdate between fromdate to todate;
+        return null;
     }
 }

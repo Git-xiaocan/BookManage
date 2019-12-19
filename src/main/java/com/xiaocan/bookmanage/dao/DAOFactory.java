@@ -8,8 +8,10 @@ import com.xiaocan.bookmanage.util.Configurations;
  */
 public class DAOFactory {
     public static DAO GetDAO(String name){
+        System.out.println(name);
         String ImplClass = Configurations.get(name);
         try {
+
             Class<?> daoClass = Class.forName(ImplClass);
             return (DAO)daoClass.newInstance();
         } catch (ClassNotFoundException e) {

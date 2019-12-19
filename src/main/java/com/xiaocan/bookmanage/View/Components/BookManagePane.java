@@ -1,7 +1,11 @@
 package com.xiaocan.bookmanage.View.Components;
 
+import com.xiaocan.bookmanage.dao.BookInfoDAO;
+import com.xiaocan.bookmanage.dao.DAOFactory;
+import com.xiaocan.bookmanage.dao.impl.BookCateDAOImpl;
+import com.xiaocan.bookmanage.dao.impl.BookInfoDAOImpl;
 import com.xiaocan.bookmanage.entity.BookInfo;
-import com.xiaocan.bookmanage.service.BookInfoService;
+import com.xiaocan.bookmanage.entity.BookSearchCondition;
 import com.xiaocan.bookmanage.service.impl.BookInfoServiceImpl;
 import com.xiaocan.bookmanage.util.Configurations;
 import com.xiaocan.bookmanage.util.SystemConstant;
@@ -19,15 +23,22 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.util.Callback;
-import sun.jvm.hotspot.debugger.Page;
 
-
-import java.awt.print.Book;
 import java.time.LocalDate;
 import java.util.List;
 
 public class BookManagePane extends StackPane {
     private TableView tableView = new TableView();
+    private ComboBox<String> cmbKind = new ComboBox<>();//分类
+    private DatePicker FromDate = new DatePicker(LocalDate.now());
+    private DatePicker dateTo = new DatePicker(LocalDate.now());
+    private TextField textSearch = new TextField("请输入关键字...");
+    private Button btnSearch = new Button("搜索");
+    private Button btnClear = new Button("清空");
+    private String[] btnTexts = {"新增", "修改", "导出", "删除"};
+    private Button[] buttons = new Button[btnTexts.length];
+    private Pagination pagination = new Pagination();
+    private final int ITEMPERPAGE = 18;//表格每页显示的数量
 
     /**
      * Creates a StackPane layout with default CENTER alignment.
@@ -45,9 +56,11 @@ public class BookManagePane extends StackPane {
         getChildren().add(tabPane);
 
 
-
-
         InitTableViewColumn();
+        //初始化搜索框
+        initSearchBtn();
+        initClearBtn();
+        CmbBookCateData();
 
     }
 
@@ -58,12 +71,7 @@ public class BookManagePane extends StackPane {
         /**
          * comboBox的数据来自数据库
          */
-        ComboBox<String> cmbKind = new ComboBox<>();//分类
-        DatePicker FromDate = new DatePicker(LocalDate.now());
-        DatePicker dateTo = new DatePicker(LocalDate.now());
-        TextField textSearch = new TextField("请输入关键字...");
-        Button btnSearch = new Button("搜索");
-        Button btnClear = new Button("清空");
+
         searchPane.getChildren().addAll(new Label("分类:"), cmbKind, new Label("时间:"), FromDate, new Label("-"), dateTo, new Label("关键字:"), textSearch, btnSearch, btnClear);
 
 
@@ -85,9 +93,9 @@ public class BookManagePane extends StackPane {
         BorderPane tableViewPane = new BorderPane();
         tableViewPane.setTop(createButtonPane());
         BorderPane.setMargin(tableViewPane, new Insets(10));
-        int pageCount = 10;//这里应该根据业务逻辑层计算页数
-        tableViewPane.setCenter(createPagination(pageCount, 17, 0));
-        tableViewPane.setBottom(createButtonPane());
+
+        tableViewPane.setCenter(createPagination(ITEMPERPAGE, 0));
+        //tableViewPane.setBottom(createButtonPane());
 
         //将搜索面板添加到跟面板中
         root.setTop(searchPane);
@@ -130,7 +138,7 @@ public class BookManagePane extends StackPane {
         for (int i = 0; i < colNames.length; i++) {
             columns[i] = new TableColumn(colNames[i]);
             //绑定tableview控件和实体类中的属性
-            columns[i].setCellValueFactory(new PropertyValueFactory<FxBook,String>(fields[i]));
+            columns[i].setCellValueFactory(new PropertyValueFactory<FxBook, String>(fields[i]));
             columns[i].setPrefWidth(colWidths[i]);
         }
         tableView.getColumns().addAll(columns);
@@ -138,25 +146,20 @@ public class BookManagePane extends StackPane {
 
     }
 
-//    class BaseSearchTask implements  Runnable{
-//
-//
-//        @Override
-//        public void run() {
-//            List<BookInfo> list = bookInfoService.searchAll();
-//            bookList.clear();
-//            list.forEach(bookInfo -> {
-//                bookList.add(new FxBook(bookInfo));
-//
-//
-//
-//            });
-//
-//
-//
-//        }
-//    }
     private BookInfoServiceImpl bookInfoService = null;
+
+    public void InitTableViewData(List<BookInfo> bookinfoList) {
+        if (bookinfoList != null) {
+            this.bookList.clear();
+            bookinfoList.forEach(book -> {
+                this.bookList.add(new FxBook(book));
+            });
+        }
+        RefreshTableView();
+
+
+    }
+
     public void InitTableViewData() {
 
         try {
@@ -168,10 +171,7 @@ public class BookManagePane extends StackPane {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-          bookInfoService.searchAll().forEach(bookInfo -> {
-              bookList.add(new FxBook(bookInfo));
-          });
-
+        InitTableViewData(bookInfoService.searchAll());
 
 
     }
@@ -388,32 +388,47 @@ public class BookManagePane extends StackPane {
      * @param currPageIndex //当前显示分页的下标
      * @return
      */
-    private Node createPagination(int PageCount, int itemPerPage, int currPageIndex) {
-        Pagination pagination = new Pagination(PageCount, currPageIndex);
+    private Node createPagination(int PageCount, int currPageIndex) {
+        RefreshTableView();
+        return pagination;
+    }
+
+    public void RefreshTableView() {
+        if (bookList != null) {
+            int count = bookList.size() / ITEMPERPAGE;
+            if (bookList.size() % ITEMPERPAGE != 0) {
+                count++;
+            }
+
+
+            pagination.setPageCount(count == 0 ? 1 : count);
+        } else {
+            pagination.setPageCount(1);
+        }
+
+        pagination.setCurrentPageIndex(0);
         pagination.setPageFactory(new Callback<Integer, Node>() {
             @Override
             public Node call(Integer param) {
                 int pageIndex = param.intValue();//获得当前分页的分页下标
-                //bookList.clear();
+//                bookList.clear();
                 tableView.getItems().clear();  //为了方便显示不同的查询结果
                 //链接数据库  根据分页下标返回队形的集合数据
                 //为了实现分页的效果 所以需要sublist
-                int fromIndex = pageIndex * itemPerPage;//起始下标
-                int toIndex = (pageIndex + 1) * itemPerPage;
+                int fromIndex = pageIndex * ITEMPERPAGE;//起始下标
+                int toIndex = (pageIndex + 1) * ITEMPERPAGE;
                 if (toIndex >= bookList.size()) toIndex = bookList.size();
                 List sublist = bookList.subList(fromIndex, toIndex);
                 tableView.setItems(FXCollections.observableArrayList(sublist));
                 return tableView;
             }
         });
-        return pagination;
     }
 
     //创建tableview上方的按钮
     private Node createButtonPane() {
         HBox ButtonPane = new HBox(10);
-        String[] btnTexts = {"新增", "修改", "导出", "删除"};
-        Button[] buttons = new Button[btnTexts.length];
+
         for (int i = 0; i < buttons.length; i++) {
             buttons[i] = new Button(btnTexts[i]);
             if (i != 3) {
@@ -425,4 +440,85 @@ public class BookManagePane extends StackPane {
         ButtonPane.getChildren().addAll(buttons);
         return ButtonPane;
     }
+
+    /**
+     * 给搜索框的分类combBox设置分类信息
+     */
+    BookCateDAOImpl bookCateDAO = null;
+
+    public void CmbBookCateData() {
+        try {
+            bookCateDAO = (BookCateDAOImpl) Class.forName(Configurations.get(SystemConstant.DAOIMPL_BOOKCATEIMPL)).newInstance();
+            bookCateDAO.GetAllParents().forEach(bookcate -> {
+                String code = bookcate.getBookCateCode();
+                String name = bookcate.getBookCateName();
+                if (name.length() > 6) {
+                    name = name.substring(0, 6);
+                }
+                cmbKind.getItems().add(code + "-" + name);
+
+
+            });
+
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        cmbKind.setValue("请选择");
+
+    }
+
+    public void initSearchBtn() {
+        this.btnSearch.setOnMouseClicked(e -> {
+            BookSearchCondition condition = null;
+            try {
+                condition = (BookSearchCondition) Class.forName(Configurations.get(SystemConstant.ENTITY_BOOK_SEARCH_CONDITION)).newInstance();
+                condition.setToDate(dateTo.getValue().toString());
+                condition.setFromDate(FromDate.getValue().toString());
+                condition.setIsbn(textSearch.getText());
+                condition.setKeyWords(textSearch.getText());
+                condition.setBookName(textSearch.getText());
+                condition.setCateCode(cmbKind.getValue().split("-")[0]);
+                System.out.println(cmbKind.getValue());
+                BookInfoDAO bookInfoDAO = (BookInfoDAOImpl) DAOFactory.GetDAO(SystemConstant.DAOIMPL_BOOKINFOIMPL);
+                // tableView.getItems().clear();
+
+
+                List<BookInfo> list = bookInfoDAO.search(condition);
+                if (list != null) {
+                    bookList.clear();
+                    list.forEach(book -> {
+                        bookList.add(new FxBook(book));
+                    });
+                }
+                RefreshTableView();
+
+            } catch (ClassNotFoundException ex) {
+                ex.printStackTrace();
+            } catch (IllegalAccessException ex) {
+                ex.printStackTrace();
+            } catch (InstantiationException ex) {
+                ex.printStackTrace();
+            }
+
+
+        });
+
+
+    }
+    public void initClearBtn(){
+
+        btnClear.setOnMouseClicked(e->{
+
+            cmbKind.setValue("请选择");
+            textSearch.setText("请输入关键字...");
+            dateTo.setValue(LocalDate.now());
+            FromDate.setValue(LocalDate.now());
+
+        });
+    }
+
 }

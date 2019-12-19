@@ -15,12 +15,14 @@ public class SystemConstant {
      */
     public static final  String TB_USER = "tb.user";
     public static final  String TB_BOOKINFO = "tb.bookinfo";
+    public static final  String TB_BOOKCATE = "tb.bookcate";
 
 /**
  * DAO配置
  */
     public static final String DAOIMPL_USERDAOIMPL = "dao.UserDAOImpl";
     public static final String DAOIMPL_BOOKINFOIMPL = "dao.BookInfoDAOImpl";
+    public static final String DAOIMPL_BOOKCATEIMPL = "dao.BookCateDAOImpl";
 
 
     /**
@@ -28,6 +30,7 @@ public class SystemConstant {
      */
     public static final String ENTITY_USERINFO= "entity.UserInfo";
     public static final String ENTITY_BOOKINFO= "entity.BookInfo";
+    public static final String ENTITY_BOOK_SEARCH_CONDITION = "entity.BookSearchCondition";
 
 
     /**

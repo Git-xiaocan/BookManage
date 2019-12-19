@@ -5,11 +5,12 @@ import com.xiaocan.bookmanage.dao.UserDAO;
 import com.xiaocan.bookmanage.entity.UserInfo;
 import com.xiaocan.bookmanage.util.Configurations;
 import com.xiaocan.bookmanage.util.SystemConstant;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-    public class UserDAOImpl extends BaseDAO implements UserDAO {
+public class UserDAOImpl extends BaseDAO implements UserDAO {
 
 
     /**
@@ -20,14 +21,14 @@ import java.util.List;
      */
     @Override
     public UserInfo search(String LoginCode) {
-        String sql = "select * from " + Configurations.get(SystemConstant.TB_USER)+" where LoginCode=?;";
-        ResultSet resultSet = db_Select(sql,LoginCode);
+        String sql = "select * from " + Configurations.get(SystemConstant.TB_USER) + " where LoginCode=?;";
+        ResultSet resultSet = db_Select(sql, LoginCode);
         UserInfo user = null;
         try {
-            if(resultSet.next()){
-                user = new UserInfo(resultSet.getInt(1),resultSet.getString(2),resultSet.getString(3)
+            if (resultSet.next()) {
+                user = new UserInfo(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3)
 
-                        ,resultSet.getString(4), resultSet.getString(5),resultSet.getString(6) );
+                        , resultSet.getString(4), resultSet.getString(5), resultSet.getString(6));
 
             }
 
@@ -35,7 +36,7 @@ import java.util.List;
             e.printStackTrace();
         }
 
-    return user;
+        return user;
     }
 
     /**
@@ -45,7 +46,7 @@ import java.util.List;
      */
     @Override
     public void save(UserInfo userInfo) {
-    String sql = "insert into t_userinfo(LoginCode,LoginPwd,UserName,IsLock ,Memo) values('"+userInfo.getLoginCode()+"','"+userInfo.getLoginPwd()+"','"+userInfo.getUserName()+"',"+userInfo.getLock()+",'"+userInfo.getMemo()+"')";
+        String sql = "insert into t_userinfo(LoginCode,LoginPwd,UserName,IsLock ,Memo) values('" + userInfo.getLoginCode() + "','" + userInfo.getLoginPwd() + "','" + userInfo.getUserName() + "'," + userInfo.getLock() + ",'" + userInfo.getMemo() + "')";
 
         db_Update(sql);
     }
