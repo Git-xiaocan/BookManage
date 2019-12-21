@@ -8,6 +8,7 @@ import javafx.scene.Node;
  *MainStage 工厂模式创建指定的内容面板
  */
 public class MainStageFactory {
+
     private static BookManagePane bookManagePane = null;
     private  static BookCatePane bookCatePane = null;
 

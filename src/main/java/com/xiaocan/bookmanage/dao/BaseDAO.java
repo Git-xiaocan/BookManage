@@ -91,7 +91,7 @@ public abstract class BaseDAO {
                 e.printStackTrace();
             }
         }
-
+        System.out.println(sql);
         return statement;
     }
 

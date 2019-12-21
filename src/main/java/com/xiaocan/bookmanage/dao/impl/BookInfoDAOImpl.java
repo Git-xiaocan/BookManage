@@ -23,6 +23,24 @@ public class BookInfoDAOImpl extends BaseDAO implements BookInfoDAO {
      */
     @Override
     public void save(BookInfo bookInfo) {
+        String sql = "insert into " + SystemConstant.TB_BOOKINFO + " values(default,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+        db_Update(
+                sql,
+                bookInfo.getISBN(),
+                bookInfo.getBookName(),
+                bookInfo.getInputCode(),
+                bookInfo.getAuthor(),
+                bookInfo.getKeyWords(),
+                bookInfo.getCateCode(),
+                bookInfo.getPublisher(),
+                bookInfo.getSummary(),
+                bookInfo.getContentInfo(),
+                bookInfo.getPrice(),
+                bookInfo.getStoreCount(),
+                bookInfo.getRegDate(),
+                bookInfo.getMemo()
+
+        );
 
     }
 
@@ -43,6 +61,7 @@ public class BookInfoDAOImpl extends BaseDAO implements BookInfoDAO {
      */
     @Override
     public void update(BookInfo bookInfo) {
+
 
     }
 
@@ -130,10 +149,17 @@ public class BookInfoDAOImpl extends BaseDAO implements BookInfoDAO {
 
 
             }
+            if( condition.getToDate() != null && condition.getFromDate() != null&&!condition.getFromDate().equals("")&& !condition.getToDate().equals(""))
             sql.append(" RegDate between '" + condition.getFromDate() + "' and '" + condition.getToDate() + "';");
+           if(sql.toString().endsWith(" or ")){
+
+               sql = new StringBuilder(sql.substring(0,sql.length()-3));
+           }
+
 
             ResultSet resultSet = db_Select(sql.toString());
             List<BookInfo> list = new ArrayList<>();
+            if(resultSet==null) return null;
             while (resultSet.next()) {
                 BookInfo bookInfo = new BookInfo(
                         resultSet.getInt(1)
@@ -161,7 +187,7 @@ public class BookInfoDAOImpl extends BaseDAO implements BookInfoDAO {
         } catch (IllegalAccessException | SQLException e) {
             e.printStackTrace();
         }
-//        bookname like %ddd% or bookid =2 or regdate between fromdate to todate;
+//
         return null;
     }
 }
