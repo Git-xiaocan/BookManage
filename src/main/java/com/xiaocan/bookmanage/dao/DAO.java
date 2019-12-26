@@ -7,7 +7,7 @@ public interface  DAO <T>{
     /**
      * 将传入的对象保存到数据表中
      */
-    void save(T t);
+    int save(T t);
 
     /**
      * 根据主键id删除指定的数据
@@ -19,7 +19,7 @@ public interface  DAO <T>{
      * 修改指定的数据
      * @param t
      */
-    void update(T t);
+    int update(T t);
 
     /**
      * 根据主键id返回对象数据

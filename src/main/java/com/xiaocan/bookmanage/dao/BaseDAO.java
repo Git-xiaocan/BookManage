@@ -85,13 +85,16 @@ public abstract class BaseDAO {
             e.printStackTrace();
         }
         for (int i = 0; i < ob.length; i++) {
+            System.out.println(ob.length);
+            System.out.println(i);
             try {
-                statement.setObject(i + 1, ob[i]);
+
+                statement.setObject( i+1, ob[i]);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
-        System.out.println(sql);
+
         return statement;
     }
 

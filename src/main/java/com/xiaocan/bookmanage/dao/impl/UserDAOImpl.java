@@ -45,10 +45,10 @@ public class UserDAOImpl extends BaseDAO implements UserDAO {
      * @param userInfo
      */
     @Override
-    public void save(UserInfo userInfo) {
+    public int save(UserInfo userInfo) {
         String sql = "insert into t_userinfo(LoginCode,LoginPwd,UserName,IsLock ,Memo) values('" + userInfo.getLoginCode() + "','" + userInfo.getLoginPwd() + "','" + userInfo.getUserName() + "'," + userInfo.getLock() + ",'" + userInfo.getMemo() + "')";
 
-        db_Update(sql);
+        return db_Update(sql);
     }
 
     /**
@@ -67,8 +67,8 @@ public class UserDAOImpl extends BaseDAO implements UserDAO {
      * @param userInfo
      */
     @Override
-    public void update(UserInfo userInfo) {
-
+    public int update(UserInfo userInfo) {
+        return -1;
     }
 
     /**

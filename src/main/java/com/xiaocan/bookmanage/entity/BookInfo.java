@@ -23,6 +23,7 @@ public class BookInfo {
     private String Memo;
 
     public BookInfo(int bookId, String ISBN, String bookName, String inputCode, String author, String keyWords, String cateCode, String publisher, String summary, String contentInfo, String price, int storeCount, String memo, String regDate) {
+
         this.bookId = bookId;
         this.ISBN = ISBN;
         this.bookName = bookName;

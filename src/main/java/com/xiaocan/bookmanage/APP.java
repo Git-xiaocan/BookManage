@@ -1,5 +1,6 @@
 package com.xiaocan.bookmanage;
 
+import com.xiaocan.bookmanage.View.Components.MyMessageBox;
 import com.xiaocan.bookmanage.View.MainStage;
 import com.xiaocan.bookmanage.entity.UserInfo;
 import javafx.application.Application;
@@ -12,6 +13,7 @@ public class APP extends Application {
         UserInfo userInfo =  new UserInfo(1,"2","测试用户","测试用户","5","6");
         primaryStage = new MainStage(userInfo);
         primaryStage.show();
+
 
     }
 

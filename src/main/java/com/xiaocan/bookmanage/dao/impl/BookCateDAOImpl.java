@@ -14,15 +14,14 @@ import java.util.List;
 public class BookCateDAOImpl extends BaseDAO implements BookCateDAO {
 
 
-
     /**
      * 将传入的对象保存到数据表中
      *
      * @param bookCate
      */
     @Override
-    public void save(BookCate bookCate) {
-
+    public int save(BookCate bookCate) {
+        return 0;
     }
 
     /**
@@ -41,8 +40,8 @@ public class BookCateDAOImpl extends BaseDAO implements BookCateDAO {
      * @param bookCate
      */
     @Override
-    public void update(BookCate bookCate) {
-
+    public int update(BookCate bookCate) {
+        return -1;
     }
 
     /**
@@ -68,7 +67,7 @@ public class BookCateDAOImpl extends BaseDAO implements BookCateDAO {
 
     @Override
     public List<BookCate> GetAllParents() {
-        String sql = "select * from " + Configurations.get(SystemConstant.TB_BOOKCATE)  + " where parentId = ?;";
+        String sql = "select * from " + Configurations.get(SystemConstant.TB_BOOKCATE) + " where parentId = ?;";
 
         ResultSet res = db_Select(sql, 0);
         List<BookCate> bookCateList = new ArrayList<>();

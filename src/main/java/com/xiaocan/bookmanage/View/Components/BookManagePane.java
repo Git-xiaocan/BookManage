@@ -14,14 +14,18 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 
 import javafx.scene.Node;
 
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.util.Callback;
 
@@ -40,22 +44,24 @@ public class BookManagePane extends StackPane {
     private Button[] buttons = new Button[btnTexts.length];
     private Pagination pagination = new Pagination();
     private final int ITEMPERPAGE = 18;//表格每页显示的数量
+    private BookEditTab  AddBook = new BookEditTab();
+    private BookEditTab UpdataBook = new BookEditTab();
+    private TabPane tabPane = null;
 
     /**
      * Creates a StackPane layout with default CENTER alignment.
      */
     public BookManagePane() {
 
-        long startTime = System.currentTimeMillis();
-        TabPane tabPane = new TabPane();
+         tabPane = new TabPane();
         tabPane.getStyleClass().add("tab-pane>*.tab-header-area>*.tab-header-background");
         //设置tabpane不能被关闭
         tabPane.setPadding(new Insets(10));
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
         Tab tab_bookManage = new Tab("图书管理", CreateTabBookManage());
-        Tab tab_bookUpdata = new Tab("修改图书",createBookUpData());
-        Tab tab_bookAdd = new Tab("添加图书",createBookAdd());
+        Tab tab_bookUpdata = new Tab("添加图书", AddBook);
+        Tab tab_bookAdd = new Tab("修改图书", UpdataBook);
 
 
         //添加tab的样式
@@ -64,19 +70,37 @@ public class BookManagePane extends StackPane {
         tab_bookManage.getStyleClass().add("tab-Item");
 
 
-        tabPane.getTabs().addAll(tab_bookManage,tab_bookAdd);
+        tabPane.getTabs().addAll(tab_bookManage, tab_bookAdd,tab_bookUpdata);
         getChildren().add(tabPane);
 
         InitTableViewColumn();
         initCom();
-        long endTime = System.currentTimeMillis();
-        System.out.println(endTime - startTime);
+        initEven();
+
 
     }
+    private void setTabIndex(int index){
+        tabPane.getSelectionModel().select(index);
+    }
+    private void initEven() {
+        tableView.setOnMouseClicked(e -> {
+            if (e.getClickCount() == 2) {
+               FxBook book =  (FxBook)tableView.getSelectionModel().getSelectedItem();
+                UpdataBook.fillData(book);
+                setTabIndex(1);
+
+            }
+
+
+        });
+
+    }
+
     //增加图书
     private Node createBookAdd() {
-        return new BookEditTab() ;
+        return new BookEditTab();
     }
+
     //修改图书
     private Node createBookUpData() {
         return null;
@@ -88,7 +112,7 @@ public class BookManagePane extends StackPane {
             public void run() {
 
                 InitTableViewData();
-               CmbBookCateData();
+                CmbBookCateData();
                 //初始化搜索框
                 initSearchBtn();
                 initClearBtn();
@@ -175,6 +199,7 @@ public class BookManagePane extends StackPane {
         int[] colWidths = {80, 120, 80, 120, 100, 120, 200, 40, 40, 80};
         for (int i = 0; i < colNames.length; i++) {
             columns[i] = new TableColumn(colNames[i]);
+
             //绑定tableview控件和实体类中的属性
             columns[i].setCellValueFactory(new PropertyValueFactory<FxBook, String>(fields[i]));
             columns[i].setPrefWidth(colWidths[i]);
@@ -213,10 +238,9 @@ public class BookManagePane extends StackPane {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-               InitTableViewData(bookInfoService.searchAll());
+                InitTableViewData(bookInfoService.searchAll());
             }
         });
-
 
 
     }
@@ -429,7 +453,7 @@ public class BookManagePane extends StackPane {
 
     /**
      * @param PageCount     //分页的总页面数
-     * @param itemPerPage   //每页显示的数据条数
+     * @param  //每页显示的数据条数
      * @param currPageIndex //当前显示分页的下标
      * @return
      */

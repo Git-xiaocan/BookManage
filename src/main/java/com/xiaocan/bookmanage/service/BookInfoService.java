@@ -11,4 +11,6 @@ public interface BookInfoService {
     public List<BookInfo> searchAll();
 
     List<BookInfo> FindByCondition(BookSearchCondition condition);
+    int save(BookInfo book);
+    int upData(BookInfo book);
 }

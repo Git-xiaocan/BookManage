@@ -170,4 +170,6 @@ public class LoginStage extends Stage {
         this.captch = CaptchMap.get((CaptchaUtil.CAPTCHA)).toString();
         imgVCode.setImage((Image) CaptchMap.get(CaptchaUtil.IMAGE));
     }
+
+
 }

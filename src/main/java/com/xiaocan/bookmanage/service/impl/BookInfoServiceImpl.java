@@ -34,4 +34,14 @@ public class BookInfoServiceImpl implements BookInfoService {
     public List<BookInfo> FindByCondition(BookSearchCondition condition) {
         return bookInfoDao.search(condition);
     }
+
+    @Override
+    public int save(BookInfo book) {
+        return bookInfoDao.save(book);
+    }
+
+    @Override
+    public int upData(BookInfo book) {
+        return bookInfoDao.update(book);
+    }
 }
